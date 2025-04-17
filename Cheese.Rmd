@@ -1,0 +1,10 @@
+---
+title: "Cheese Data Analysis"
+author: "Dakota Chang, Katherine Danielson"
+date: 2025-04-17
+output:
+  github_document:
+    toc: true
+---
+
+# Cheese Data Importing
