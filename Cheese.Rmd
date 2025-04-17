@@ -7,4 +7,89 @@ output:
     toc: true
 ---
 
-# Cheese Data Importing
+## Cheese Data Intro
+
+**Background Information**
+
+(TODO: BACKGROUND STUFF)
+
+Source: <https://github.com/rfordatascience/tidytuesday/blob/main/data/2024/2024-06-04/readme.md>
+
+## Importing Data and Libraries
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+```{r}
+cheeses <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2024/2024-06-04/cheeses.csv')
+
+cheeses
+```
+
+## EDA
+```{r}
+cheeses %>%
+  group_by(country) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  head(10) %>%
+  ggplot(aes(x = reorder(country, -count), y = count)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Top 10 Countries by Cheese Count", x = "Country", y = "Count")
+```
+
+```{r}
+cheeses %>%
+  group_by(milk) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  ggplot(aes(x = reorder(milk, -count), y = count)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Top Milk Types by Cheese Count", x = "Milk Type", y = "Count")
+```
+```{r}
+cheeses %>%
+  mutate(milk = str_split(milk, ", ")) %>%
+  unnest(milk) %>%
+  group_by(milk) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  ggplot(aes(x = reorder(milk, -count), y = count)) +
+  geom_bar(stat = "identity", fill = '#eecc11') +
+  coord_flip() +
+  labs(title = "Milk Types by Cheese Count", x = "Milk Type", y = "Count") +
+  geom_text(aes(x = milk, y = count,label=count),hjust=-0.1) +
+  theme_minimal()
+
+```
+```{r}
+cheeses %>%
+  group_by(type) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  head(10) %>%
+  ggplot(aes(x = reorder(type, -count), y = count)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Top 10 Types by Cheese Count", x = "Cheese Type", y = "Count")
+```
+
+```{r}
+cheeses %>%
+  mutate(type = str_split(type, ", ")) %>%
+  unnest(type) %>%
+  group_by(type) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  ggplot(aes(x = reorder(type, -count), y = count)) +
+  geom_bar(stat = "identity", fill = '#eecc11') +
+  coord_flip() +
+  labs(title = "Types by Cheese Count", x = "Country", y = "Count") +
+  geom_text(aes(x = type, y = count,label=count),hjust=-0.1) +
+  theme_minimal()
+```
