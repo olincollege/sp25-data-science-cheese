@@ -15,7 +15,7 @@ Source: <https://github.com/rfordatascience/tidytuesday/blob/main/data/2024/2024
 
 *Sourcing and Credibility*
 
-This project uses the dataset from the[ TidyTuesday: Cheese Week (June 4, 2024)](https://github.com/rfordatascience/tidytuesday/blob/main/data/2024/2024-06-04/readme.md) initiative. The data is from Cheese.com, a long-standing online encyclopedia for cheeses, and was scraped by data scientist Thomas Mock and Jon Harmon for the purposes of public exploration and education.
+This project uses the dataset from the [TidyTuesday: Cheese Week (June 4, 2024)](https://github.com/rfordatascience/tidytuesday/blob/main/data/2024/2024-06-04/readme.md) initiative. The data is from Cheese.com, a long-standing online encyclopedia for cheeses, and was scraped by data scientist Thomas Mock and Jon Harmon for the purposes of public exploration and education.
 
 This is a popular reference sites and is one of the largest cheese databases in the world, hosting extensive listings and descriptions of cheese worldwide. However, while it hosts a large amount of data, it is not academic nor industry-certified; thus, it introduces uncertainty about standardization and objectivity surrounding entries. Unfortunately, the original site's data-entry methodology is not transparent.
 
@@ -51,16 +51,38 @@ df_cheeses
 ncol(df_cheeses)
 nrow(df_cheeses)
 summary(df_cheeses)
+
+df_cheeses %>% 
+  distinct(cheese)
+
+sapply(df_cheeses, function(x) sum(is.na(x)))  # Count missing values per column
+
 ```
 
 **Observations:**
 
--   
+-   This dataset has 19 columns and 1187 rows.
+
+    -   As each cheese only has one set of information associated with it, that means there are 1187 distinct cheeses in the dataset. Thus, each cheese is only found in one county/region.
+
+-   The majority of data in the dataset is in character form.
+
+    -   Things like `type`, `texture` and `flavor` are all characters separated by commas. Thus, data analysis can both be performed with the data as it is and data where the lists are wrangled apart.
+
+-   There are a lot of missing datapoints in a variety of columns.
+
+    -   The only two columns that have no missing information are `cheese` and its associated `url`.
+
+    -   Comparatively, `alt_spellings` has the highest number at 1078. This indicates that 1078 of the cheeses do no have any other spellings, which should not impact data analysis.
+
+    -   However, there are some more valuable variables that are missing a high quantity of their data such as `fat_content` and `region` and if a cheese is `vegetarian`.
+
+-   The majority of cheese recorded are not `veagan` while roughly 50% of the cheeses that report if they are `vegetarian` show that they are.
 
 The important variables in this dataset are:
 
 | Variable | Class | Description |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | cheese | character | Name of the cheese. |
 | url | character | Location of the cheese's description at cheese.com |
 | milk | character | The type of milk used for the cheese, when known. |
