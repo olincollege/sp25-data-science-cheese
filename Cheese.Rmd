@@ -9,7 +9,7 @@ output:
 
 ## Cheese Data Intro
 
-**Background Information**
+#### **Background Information**
 
 Source: <https://github.com/rfordatascience/tidytuesday/blob/main/data/2024/2024-06-04/readme.md>
 
@@ -25,11 +25,31 @@ With a lack of transparent data entry, this introduces potential errors in data 
 
 This dataset is a non-random sample, containing \~1,200 cheeses documented on Cheese.com as of 2024. This does not represent the full global population of cheeses but is instead a convenience sample—limited to what has been posted/entered online. Therefore, selection bias is present. Well-known cheeses or those with wider international distribution are likely overrepresented. Regional or artisanal cheeses with less online presence may be underrepresented.
 
-**Question and Exploration**
+#### **Question and Exploration**
 
 -   What question did you set out to answer?
 
 -   What data did you find to help answer that question?
+
+#### **Population**
+
+-   We will be looking at the non-random sample (1187 cheese) from the cheese.com TidyTuesday dataset.
+
+#### **Quantity of interest**
+
+-   Our main quantity of interest is the country. This recognizes where a cheese is being produced.
+
+#### **Question / Hypothesis**
+
+-   How are country and cheese qualities, namely milk type, flavor and cheese type, related?
+
+    -   Null hypothesis: There is no statistical difference between different countries based on certain cheese qualities.
+
+        -   There is no statistical difference between different countries based on type of cheese.
+
+        -   There is no statistical difference between different countries based on the milk used in cheese.
+
+        -   There is no statistical difference between different countries based on the flavor of cheese.
 
 ## Importing Data and Libraries
 
