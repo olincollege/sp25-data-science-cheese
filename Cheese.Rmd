@@ -97,7 +97,7 @@ sapply(df_cheeses, function(x) sum(is.na(x)))  # Count missing values per column
 
     -   However, there are some more valuable variables that are missing a high quantity of their data such as `fat_content` and `region` and if a cheese is `vegetarian`.
 
--   The majority of cheese recorded are not `veagan` while roughly 50% of the cheeses that report if they are `vegetarian` show that they are.
+-   The majority of cheese recorded are not `vegan` while roughly 50% of the cheeses that report if they are `vegetarian` show that they are.
 
 The important variables in this dataset are:
 
@@ -123,6 +123,8 @@ The important variables in this dataset are:
 | alt_spellings | character | Alternative spellings of the name of the cheese (likely overlaps with synonyms). |
 | producers | character | Known producers of the cheese. |
 
+## Exploration of Country
+
 ```{r}
 df_cheeses %>%
   group_by(country) %>%
@@ -130,29 +132,43 @@ df_cheeses %>%
   arrange(desc(count)) %>%
   head(10) %>%
   ggplot(aes(x = reorder(country, -count), y = count)) +
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", fill = '#eecc11') +
   coord_flip() +
-  labs(title = "Top 10 Countries by Cheese Count", x = "Country", y = "Count")
+  labs(title = "Top 10 Countries by Cheese Count", x = "Country", y = "Count")+
+  theme_minimal()
 ```
 
 **Observations:**
 
--   
+-   In this database, the United States has a significantly higher number of cheese types represented compared to other countries. The U.S. lists over 300 types, while the second-highest, France, has just over 150—meaning the U.S. has nearly twice as many. This discrepancy could be due to a few factors. The most likely explanations are: (1) the U.S. genuinely produces a wider variety of cheeses, or (2) the source of the data—a cheese e-commerce platform—may be based in the U.S. or have more partnerships with U.S.-based producers.
 
 ```{r}
+# stacked bar chart of milk type in top 5 country
+
 df_cheeses %>%
-  group_by(milk) %>%
-  summarise(count = n()) %>%
-  arrange(desc(count)) %>%
-  ggplot(aes(x = reorder(milk, -count), y = count)) +
-  geom_bar(stat = "identity") +
+  mutate(
+    milk_list = str_split(milk, ", ")
+  ) %>%
+  unnest(milk_list) %>%
+  filter(country %in% c("United States", "France", "Italy", "Canada", "Australia")) %>%
+  ggplot(aes(x = country, fill = milk_list)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
   coord_flip() +
-  labs(title = "Top Milk Types by Cheese Count", x = "Milk Type", y = "Count")
+  labs(
+    title = "Top 5 Countries by Cheese Milk Type Composition",
+    x = "Country", y = "Percentage", fill = "Milk Type"
+  ) +
+  theme_minimal()
+
 ```
 
 **Observations:**
 
--   
+-   This stacked bar chart shows that certain countries bias developing cheeses with certain types of milk. For example, Italy has a lot more cheeses made with sheep milk compared to all other countries. 
+(TODO: Is this true? our sample might be wrong? do i need to amend this?)
+
+## Exploration of Milk Types
 
 ```{r}
 df_cheeses %>%
@@ -167,12 +183,32 @@ df_cheeses %>%
   labs(title = "Milk Types by Cheese Count", x = "Milk Type", y = "Count") +
   geom_text(aes(x = milk, y = count,label=count),hjust=-0.1) +
   theme_minimal()
-
 ```
 
 **Observations:**
 
--   
+-   It seems that the overwhelming majority of cheese is made from cow's milk, with goat's milk being the second most common. This is not surprising, as cow's milk is the most widely produced milk in the world. Sheep's milk is the third most common, but it is still significantly less common than cow's and goat's milk. This is likely due to the fact that sheep's milk is less widely available and more expensive than cow's and goat's milk. We also see a few interesting milks, for example, there is one cheese made of moose milk, one of donkey milk, one of camel milk, and four of yak milks. We also see that plant-based milks are listed, but not with any specifications of which kind. It is important to note that this graph removes the detail of cheese made with a few different milks.
+
+
+```{r}
+df_cheeses %>%
+  filter(str_detect(milk, ", ")) %>%  # Only rows with multiple milk types
+  group_by(milk) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  ggplot(aes(x = reorder(milk, -count), y = count)) +
+  geom_bar(stat = "identity", fill = '#eecc11') +
+  coord_flip() +
+  labs(title = "Cheeses Made with Mixed Milk Types", x = "Milk Combination", y = "Count") +
+  geom_text(aes(label = count), hjust = -0.1) +
+  theme_minimal()
+```
+
+**Observations:**
+
+-   The most common combination of milk types is cow and goat, which is not surprising given that these are the two most common types of milk used in cheese production. We also see that there are two cheeses that are made from four types of milk (cow, goat, sheep, water buffalo).
+
+## Cheese Types
 
 ```{r}
 df_cheeses %>%
@@ -181,14 +217,16 @@ df_cheeses %>%
   arrange(desc(count)) %>%
   head(10) %>%
   ggplot(aes(x = reorder(type, -count), y = count)) +
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", fill = '#eecc11') +
   coord_flip() +
-  labs(title = "Top 10 Types by Cheese Count", x = "Cheese Type", y = "Count")
+  labs(title = "Top 10 Types (non-separated) by Cheese Count", x = "Cheese Type", y = "Count")+
+  theme_minimal()
+
 ```
 
 **Observations:**
 
--   
+-   The most common cheese type is semi-hard and artisan. The top four all include artisan as a quality, which is not a regulated term, and might be used as a marketing tactic when it comes to types. 
 
 ```{r}
 df_cheeses %>%
@@ -207,7 +245,7 @@ df_cheeses %>%
 
 **Observations:**
 
--   
+-   We see that artisan is the most popular typing. We aso see that soft and semi-soft lead the charts, suggesting that they are the most popular types of cheese on cheese.com.
 
 ## Data Analysis
 
