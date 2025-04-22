@@ -96,7 +96,7 @@ sapply(df_cheeses, function(x) sum(is.na(x)))  # Count missing values per column
 The important variables in this dataset are:
 
 | Variable | Class | Description |
-|------------------------|------------------------|------------------------|
+|----|----|----|
 | cheese | character | Name of the cheese. |
 | url | character | Location of the cheese's description at cheese.com |
 | milk | character | The type of milk used for the cheese, when known. |
@@ -230,7 +230,7 @@ df_cheeses %>%
   ggplot(aes(x = reorder(type, -count), y = count)) +
   geom_bar(stat = "identity", fill = '#eecc11') +
   coord_flip() +
-  labs(title = "Types by Cheese Count", x = "Country", y = "Count") +
+  labs(title = "Types by Cheese Count", x = "Cheese Type", y = "Count") +
   geom_text(aes(x = type, y = count,label=count),hjust=-0.1) +
   theme_minimal()
 ```
@@ -238,5 +238,37 @@ df_cheeses %>%
 **Observations:**
 
 -   We see that artisan is the most popular `type` of cheese. This is then followed by soft and semi-soft, suggesting that they are additionally popular kinds of cheese on cheese.com. When looking at the graph "Top 10 Types (non-separated) by Cheese Count" we can see that the top four cheese `types` all include some form of artisan cheese type; thus, making the 635 counts of artisan cheese highly reasonable. Additionally, that graph shows a wide combination of different types of soft and semi-soft cheeses, indicating it is a popular blended type or characterization of cheese.
+
+```{r}
+# stacked bar chart cheese vs milk types ordered by number of cheese types
+df_cheeses %>%
+  mutate(
+    milk_list = str_split(milk, ", ")
+  ) %>%
+  unnest(milk_list) %>%
+  mutate(
+    type_list = str_split(type, ", ")
+  ) %>%
+  unnest(type_list) %>%
+  group_by(milk_list, type_list) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>% 
+  group_by(milk_list) %>% 
+  mutate(
+    n_total = sum(count),
+    frac = count / n_total,
+    n_categories = n()
+  ) %>% 
+  ggplot(aes(x = reorder(milk_list, n_categories), fill = type_list)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  coord_flip() +
+  labs(
+    title = "Milk Type vs Cheese Type Composition",
+    x = "Milk Type", y = "Percentage", fill = "Cheese Type"
+  ) +
+  theme_minimal()
+
+```
 
 ## Conclusion and Remaining Questions
