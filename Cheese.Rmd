@@ -25,12 +25,6 @@ With a lack of transparent data entry, this introduces potential errors in data 
 
 This dataset is a non-random sample, containing \~1,200 cheeses documented on Cheese.com as of 2024. This does not represent the full global population of cheeses but is instead a convenience sample—limited to what has been posted/entered online. Therefore, selection bias is present. Well-known cheeses or those with wider international distribution are likely overrepresented. Regional or artisanal cheeses with less online presence may be underrepresented.
 
-#### **Question and Exploration**
-
--   What question did you set out to answer?
-
--   What data did you find to help answer that question?
-
 #### **Population**
 
 -   We will be looking at the non-random sample (1187 cheese) from the cheese.com TidyTuesday dataset.
@@ -165,8 +159,7 @@ df_cheeses %>%
 
 **Observations:**
 
--   This stacked bar chart shows that certain countries bias developing cheeses with certain types of milk. For example, Italy has a lot more cheeses made with sheep milk compared to all other countries. 
-(TODO: Is this true? our sample might be wrong? do i need to amend this?)
+-   This stacked bar chart shows that certain countries bias developing cheeses with certain types of milk. For example, Italy has a lot more cheeses made with sheep milk compared to all other countries. (TODO: Is this true? our sample might be wrong? do i need to amend this?)
 
 ## Exploration of Milk Types
 
@@ -188,7 +181,6 @@ df_cheeses %>%
 **Observations:**
 
 -   It seems that the overwhelming majority of cheese is made from cow's milk, with goat's milk being the second most common. This is not surprising, as cow's milk is the most widely produced milk in the world. Sheep's milk is the third most common, but it is still significantly less common than cow's and goat's milk. This is likely due to the fact that sheep's milk is less widely available and more expensive than cow's and goat's milk. We also see a few interesting milks, for example, there is one cheese made of moose milk, one of donkey milk, one of camel milk, and four of yak milks. We also see that plant-based milks are listed, but not with any specifications of which kind. It is important to note that this graph removes the detail of cheese made with a few different milks.
-
 
 ```{r}
 df_cheeses %>%
@@ -226,7 +218,7 @@ df_cheeses %>%
 
 **Observations:**
 
--   The most common cheese type is semi-hard and artisan. The top four all include artisan as a quality, which is not a regulated term, and might be used as a marketing tactic when it comes to types. 
+-   The most common cheese type is semi-hard and artisan. The top four all include artisan as a quality, which is not a regulated term, and might be used as a marketing tactic when it comes to types.
 
 ```{r}
 df_cheeses %>%
@@ -245,8 +237,6 @@ df_cheeses %>%
 
 **Observations:**
 
--   We see that artisan is the most popular typing. We aso see that soft and semi-soft lead the charts, suggesting that they are the most popular types of cheese on cheese.com.
-
-## Data Analysis
+-   We see that artisan is the most popular `type` of cheese. This is then followed by soft and semi-soft, suggesting that they are additionally popular kinds of cheese on cheese.com. When looking at the graph "Top 10 Types (non-separated) by Cheese Count" we can see that the top four cheese `types` all include some form of artisan cheese type; thus, making the 635 counts of artisan cheese highly reasonable. Additionally, that graph shows a wide combination of different types of soft and semi-soft cheeses, indicating it is a popular blended type or characterization of cheese.
 
 ## Conclusion and Remaining Questions
