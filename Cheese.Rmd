@@ -43,7 +43,7 @@ This dataset is a non-random sample, containing \~1,200 cheeses documented on Ch
 
         -   There is no statistical difference between different countries based on the milk used in cheese.
 
-        -   There is no statistical difference between different countries based on the flavor of cheese.
+        -   There is no statistical difference between different countries based on the color of cheese.
 
 ## Importing Data and Libraries
 
@@ -52,6 +52,8 @@ library(tidyverse)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+library(purrr)
+library(broom)
 ```
 
 ```{r}
@@ -96,7 +98,7 @@ sapply(df_cheeses, function(x) sum(is.na(x)))  # Count missing values per column
 The important variables in this dataset are:
 
 | Variable | Class | Description |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | cheese | character | Name of the cheese. |
 | url | character | Location of the cheese's description at cheese.com |
 | milk | character | The type of milk used for the cheese, when known. |
@@ -135,31 +137,6 @@ df_cheeses %>%
 **Observations:**
 
 -   In this database, the United States has a significantly higher number of cheese types represented compared to other countries. The U.S. lists over 300 types, while the second-highest, France, has just over 150—meaning the U.S. has nearly twice as many. This discrepancy could be due to a few factors. The most likely explanations are: (1) the U.S. genuinely produces a wider variety of cheeses, or (2) the source of the data—a cheese e-commerce platform—may be based in the U.S. or have more partnerships with U.S.-based producers.
-
-```{r}
-# stacked bar chart of milk type in top 5 country
-
-df_cheeses %>%
-  mutate(
-    milk_list = str_split(milk, ", ")
-  ) %>%
-  unnest(milk_list) %>%
-  filter(country %in% c("United States", "France", "Italy", "Canada", "Australia")) %>%
-  ggplot(aes(x = country, fill = milk_list)) +
-  geom_bar(position = "fill") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  coord_flip() +
-  labs(
-    title = "Top 5 Countries by Cheese Milk Type Composition",
-    x = "Country", y = "Percentage", fill = "Milk Type"
-  ) +
-  theme_minimal()
-
-```
-
-**Observations:**
-
--   This stacked bar chart shows that certain countries bias developing cheeses with certain types of milk. For example, Italy has a lot more cheeses made with sheep milk compared to all other countries. (TODO: Is this true? our sample might be wrong? do i need to amend this?)
 
 ## Exploration of Milk Types
 
@@ -239,6 +216,33 @@ df_cheeses %>%
 
 -   We see that artisan is the most popular `type` of cheese. This is then followed by soft and semi-soft, suggesting that they are additionally popular kinds of cheese on cheese.com. When looking at the graph "Top 10 Types (non-separated) by Cheese Count" we can see that the top four cheese `types` all include some form of artisan cheese type; thus, making the 635 counts of artisan cheese highly reasonable. Additionally, that graph shows a wide combination of different types of soft and semi-soft cheeses, indicating it is a popular blended type or characterization of cheese.
 
+## Analysis
+
+```{r}
+# stacked bar chart of milk type in top 5 country
+
+df_cheeses %>%
+  mutate(
+    milk_list = str_split(milk, ", ")
+  ) %>%
+  unnest(milk_list) %>%
+  filter(country %in% c("United States", "France", "Italy", "Canada", "Australia")) %>%
+  ggplot(aes(x = country, fill = milk_list)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  coord_flip() +
+  labs(
+    title = "Top 5 Countries by Cheese Milk Type Composition",
+    x = "Country", y = "Percentage", fill = "Milk Type"
+  ) +
+  theme_minimal()
+
+```
+
+**Observations:**
+
+-   This stacked bar chart shows that certain countries bias developing cheeses with certain types of milk. For example, Italy has a lot more cheeses made with sheep milk compared to all other countries. (TODO: Is this true? our sample might be wrong? do i need to amend this?)
+
 ```{r}
 # stacked bar chart cheese vs milk types ordered by number of cheese types
 df_cheeses %>%
@@ -270,5 +274,82 @@ df_cheeses %>%
   theme_minimal()
 
 ```
+
+**Observations:**
+
+-   
+
+```{r}
+top_countries <- df_cheeses %>%
+  count(country, sort = TRUE) %>%
+  slice_head(n = 5) %>%
+  pull(country)
+
+# Then, filter the data to only include those countries and group by cheese_color
+df_cheeses %>%
+  filter(country %in% top_countries) %>%
+  group_by(country, color) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  ggplot(aes(x = reorder(country, -count), y = count, fill = color)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    x = "Country",
+    y = "Number of Cheeses",
+    title = "Top 5 Cheese-Producing Countries by Color",
+    fill = "Cheese Color"
+  ) +
+  theme_minimal()
+
+#Run a Chi Squared test for each color across the different top five countries
+# Top 5 countries with most cheeses
+top_countries <- df_cheeses %>%
+  count(country, sort = TRUE) %>%
+  slice_head(n = 5) %>%
+  pull(country)
+
+# Filter cheese data to top countries only
+df_filtered <- df_cheeses %>%
+  filter(country %in% top_countries)
+
+# List of cheese colors
+cheese_colors <- df_filtered %>%
+  distinct(color) %>%
+  pull()
+
+# Run chi-squared test per color, safely
+color_tests <- map_df(cheese_colors, function(clr) {
+  df_color <- df_filtered %>%
+    filter(color == clr)
+
+  # Contingency table of country counts
+  tbl <- table(df_color$country)
+
+  # Skip if less than 2 non-zero entries
+  if (sum(tbl > 0) < 2) return(NULL)
+
+  # Run test and return tidy result
+  chisq_result <- chisq.test(tbl)
+  tidy(chisq_result) %>%
+    mutate(color = clr)
+})
+
+# View results
+color_tests %>%
+  select(color, statistic, p.value)
+```
+
+**Observations:**
+
+*"Top 5 Cheese-Producing Countries by Color"*
+
+-   When looking at the visualization "Top 5 Cheese-Producing Countries by Color" there is a very large span of cheese colors and the presence of each of them.
+
+-   Three colors as well as NAs appear to be prominent across all of the top five countries: pale yellow, white, and ivory. While these three cheese are all mostly prominent (but to a lesser extent in Australia), there is still a large variation between all of the countries. This could be for a variety of different reasons. This could be influenced by the milk and type palette of the cheese as well as the overall production value. The latter is largely true as we see generally an overarching decreasing trend as we go from the U.S. to France to Italy to Canada to Australia with the cheese colors. However, there are several exceptions. One of these exceptions is the minimal/diminished presence of white cheese in Canada, where the coloring is more distributed, while Australia has mainly white cheeses. Another exception is pale yellow cheese and to an extent ivory cheese. This cheese is seen in abundance in the United States, but much less so in other countries.
+
+-   It is important to note that NA reportings for cheese colors appear to be especially high in places like France. This could lead to a skewing of data and make it hard to interpret if the values are actually statistically different.
+
+*Chi-Squared Table*
+
+-   The Chi-Squared table shows that there is a statistical difference between different countries and certain cheese colors. The three cheese colors exhibiting the highest difference are ivory, white and pale yellow (as seen in the prior observations). These cheese colors have both a very low p-value and a very high Chi-Squared statistic value, indicating a large difference between countries. When setting a 0.05 significance value 6/13 cheeses fall above this list, indicating that due to their higher p-value and low statistic value, there is not a statistical difference between cheese color and country for them. This may be due to a smaller sample size/presence of these cheeses in general, however. Overall, it can be said that there is a statistical difference between certain cheese colors across the top five countries that produce cheese.
 
 ## Conclusion and Remaining Questions
