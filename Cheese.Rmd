@@ -331,7 +331,17 @@ milk_chi_tests %>%
 
 **Observations:**
 
--   This stacked bar chart shows that certain countries bias developing cheeses with certain types of milk. For example, Italy has a lot more cheeses made with sheep milk compared to all other countries. (TODO: Is this true? our sample might be wrong? do i need to amend this?)
+*"Top 5 Countries by Cheese Milk Type Composition"*
+
+-   This stacked bar chart shows that certain countries bias developing cheeses with certain types of milk. For example, Italy has a lot more cheeses made with sheep milk compared to all other countries. However, there can be trends seen for the most common kinds of milk across all countries. That is, in all top five countries, cow milk is the most common type of milk to use in cheeses. With the exception of Italy (which uses a lot more sheep and water buffalo milk than any other country), goat milk and then sheep milk are the next two most popular kinds of milk in cheeses. It is important to note that the actual percentage allocations between all the countries shift quiet variably.
+
+-   The United States, Italy, Canada and Australia all appear to use at least some percent of buffalo, cow, goat, sheep and water buffalo milk and have at least some milks where the cheese was not reported (NA). Comparatively, cheeses from France appear to have all milk documented for all of their cheeses (no NA values) and only use three milks: goat sheep and cow.
+
+*Chi-Squared Tests*
+
+-   When performing a single chi-squared test across countries with their milk counts, the chi-squared across all cheeses and the top five countries shows a very low p value and a very high X-squared value, indicating significant difference.
+
+-   The second chi-squared test looks at each individual cheese's variation. All of them still have a p-value beneath 0.01 and have a very high X-squared value. The most prominent statistical difference is seen through the proportionate use of sheep milk. When referencing the *Top 5 Countries by Cheese Milk Type Composition* we see that this is echoed with the high level of variation seen between the size of blue bars across countries. Overarchingly, it is reasonable to say there is a statistical difference between the top five countries producing cheese and their milk proportion use.
 
 ***cheese type vs. country***
 
