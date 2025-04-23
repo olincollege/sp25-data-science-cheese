@@ -35,15 +35,15 @@ This dataset is a non-random sample, containing \~1,200 cheeses documented on Ch
 
 #### **Question / Hypothesis**
 
--   How are country and cheese qualities, namely milk type, flavor and cheese type, related?
+-   How are the top five cheese-producing countries and cheese qualities, namely milk type, color and cheese type, related?
 
-    -   Null hypothesis: There is no statistical difference between different countries based on certain cheese qualities.
+    -   Null hypothesis: There is no statistical difference between the top five cheese-producing countries based on certain cheese qualities.
 
-        -   There is no statistical difference between different countries based on type of cheese.
+        -   There is no statistical difference between the top five cheese-producing countries based on type of cheese.
 
-        -   There is no statistical difference between different countries based on the milk used in cheese.
+        -   There is no statistical difference between the top five cheese-producing countries based on the milk used in cheese.
 
-        -   There is no statistical difference between different countries based on the color of cheese.
+        -   There is no statistical difference between the top five cheese-producing countries based on the color of cheese.
 
 ## Importing Data and Libraries
 
@@ -423,3 +423,40 @@ color_tests %>%
 -   The Chi-Squared table shows that there is a statistical difference between different countries and certain cheese colors. The three cheese colors exhibiting the highest difference are ivory, white and pale yellow (as seen in the prior observations). These cheese colors have both a very low p-value and a very high Chi-Squared statistic value, indicating a large difference between countries. When setting a 0.05 significance value 6/13 cheeses fall above this list, indicating that due to their higher p-value and low statistic value, there is not a statistical difference between cheese color and country for them. This may be due to a smaller sample size/presence of these cheeses in general, however. Overall, it can be said that there is a statistical difference between certain cheese colors across the top five countries that produce cheese.
 
 ## Conclusion and Remaining Questions
+
+***Conclusions***
+
+Our guiding question for this analysis was: "How are the top five cheese-producing countries and cheese qualities, namely milk type, color and cheese type, related?" In turn, this led to the null hypotheses of:
+
+-   There is no statistical difference between the top five cheese-producing countries based on certain cheese qualities.
+    -   There is no statistical difference between the top five cheese-producing countries based on type of cheese.
+    -   There is no statistical difference between the top five cheese-producing countries based on the milk used in cheese.
+    -   There is no statistical difference between the top five cheese-producing countries based on the color of cheese.
+
+From our key analyses about we reject the null hypothesis for \_\_\_\_\_\_.
+
+***Remaining Questions***
+
+As this analysis only focused on the top five cheese-producing countries to make the analysis comprehensible, it would be interesting to *analyze other countries further*. This could lead to several questions:
+
+-   "Do these statistical differences continue when analyzing only smaller cheese-producing countries?"
+
+-   "How does variation in cheese type, milk and color change when countries produce less cheese?"
+
+Other questions could look at *more aspects of cheese or different regions*:
+
+-   "How are country and cheese qualities, namely milk type, flavor and cheese type, related?"
+
+-   "How are regions in a specific country and cheese qualities, namely milk type, flavor and cheese type, related?"
+
+-   "How are the country and cheese qualities, namely cheese flavor, family and texture, related?"
+
+As the *method of data collection and categorization* is unclear it led to several other questions:
+
+-   "How was the color and flavor of cheese determined? Is there a standardized way that these were categorized?"
+
+-   "Why can a cheese only be produced in one country?"
+
+-   "Where did cheese.com collect this data from and how?"
+
+This project led to many interesting insights. With a dataset with as many variables as this cheese dataset, there are many more questions that can be asked to further explore possible relations and differences with cheeses and their production.
