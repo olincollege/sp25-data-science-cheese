@@ -251,6 +251,9 @@ df_cheeses %>%
 ## Analysis
 
 ```{r}
+```
+
+```{r}
 # stacked bar chart of milk type in top 5 country
 
 df_cheeses %>%
@@ -344,6 +347,34 @@ milk_chi_tests %>%
 -   The second chi-squared test looks at each individual cheese's variation. All of them still have a p-value beneath 0.01 and have a very high X-squared value. The most prominent statistical difference is seen through the proportionate use of sheep milk. When referencing the *Top 5 Countries by Cheese Milk Type Composition* we see that this is echoed with the high level of variation seen between the size of blue bars across countries. Overarchingly, it is reasonable to say there is a statistical difference between the top five countries producing cheese and their milk proportion use.
 
 ***cheese type vs. country***
+
+```{r}
+# stacked bar chart of cheese type in top 5 country
+df_cheeses %>%
+  mutate(
+    type_list = str_split(type, ", ")
+  ) %>%
+  unnest(type_list) %>%
+  filter(country %in% c(
+    "United States",
+    "France",
+    "Italy",
+    "Canada",
+    "Australia"
+  )) %>%
+  group_by(country, type_list) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  ggplot(aes(x = reorder(country, -count), fill = type_list)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  coord_flip() +
+  labs(
+    title = "Top 5 Countries by Cheese Type Composition",
+    x = "Country", y = "Percentage", fill = "Type"
+  ) +
+  theme_minimal()
+```
 
 **Observations:**
 
