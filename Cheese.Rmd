@@ -1,7 +1,7 @@
 ---
 title: "Cheese Data Analysis"
 author: "Dakota Chang, Katherine Danielson"
-date: 2025-04-17
+date: 2025-04-25
 output:
   github_document:
     toc: true
@@ -21,9 +21,13 @@ This is a popular reference sites and is one of the largest cheese databases in 
 
 *Potential Errors, Uncertainties and Ambiguities*
 
-With a lack of transparent data entry, this introduces potential errors in data classification. If the website was created through other available data sources or different customer entries, there could be potential errors in classification (e.g., inconsistent naming of regions, vague flavor descriptors) and missing values due to non-uniform entries across cheeses. Additionally, with a lack of transparency, there could be a bias in certain aspects of data entry. For example, it appears in this dataset that the United States of America produces the most kinds of cheese, with France and Italy at different points behind. However, France and Italy are renowned for being some of the top producers of cheeses worldwide with the United States always behind them.
+This source introduces a multitude of areas for potential error and uncertainties.
 
-This dataset is a non-random sample, containing \~1,200 cheeses documented on Cheese.com as of 2024. This does not represent the full global population of cheeses but is instead a convenience sample—limited to what has been posted/entered online. Therefore, selection bias is present. Well-known cheeses or those with wider international distribution are likely overrepresented. Regional or artisanal cheeses with less online presence may be underrepresented.
+Firstly, as this data was scraped from cheese.com in 2024, there are discontinuities between the cheeses then and now. There is a possibility this led to errors like 5 yak-milk cheeses being present in currently, but only 4 in the 2024 scraping. While this could be due to timing differences, with a lack of tracking on data entry times, this could additionally be due to errors in scraping the web. Consequently, this leads to questions on the legitimacy of the dataset.
+
+Most importantly, there is a lack of transparency surrounding data entry and collection which introduces potential errors in data classification. If the website was created through other available data sources or different customer entries, there could be potential errors in classification (e.g., inconsistent naming of regions, vague flavor descriptors) and missing values due to non-uniform entries across cheeses. Additionally, it appears as though some cheeses are classified as different cheeses when they are only aged differently, while some cheeses are classified the same for different levels of aging. Additionally, with a lack of transparency, there could be a bias in certain aspects of data entry. For example, it appears in this dataset that the United States of America produces the most kinds of cheese, with France and Italy at different points behind. However, France and Italy are renowned for being some of the top producers of cheeses worldwide with the United States always behind them. As this is a website that sells cheeses and/or offers locations to sell cheeses as well as boasts its unique cheese collection, collection bias is introduced. It is likely that cheeses that are overly common are highly present as a site of cheeses would be "incomplete" without them. Further, as they boast their unique and broad collection, they also likely highlight very artisan and varied cheeses.
+
+This dataset is a non-random sample, containing \~1,200 cheeses documented on Cheese.com as of 2024. This does not represent the full global population of cheeses but is instead a convenience sample—limited to what has been posted/entered online. Therefore, selection bias is present. Well-known cheeses or those with wider international distribution are likely overrepresented. Regional or artisanal cheeses with less online presence may be underrepresented. Additionally, due to the fact that this sampling is not random, it would be unhelpful to perform confidence and prediction intervals as data would be skewed. Instead, source criticism (as seen above) is better to clarify the uncertainty seen in this dataset.
 
 #### **Population**
 
@@ -119,7 +123,7 @@ The important variables in this dataset are:
 | alt_spellings | character | Alternative spellings of the name of the cheese (likely overlaps with synonyms). |
 | producers | character | Known producers of the cheese. |
 
-## Exploration of Country
+### Exploration of Country
 
 ```{r}
 df_cheeses %>%
@@ -138,7 +142,7 @@ df_cheeses %>%
 
 -   In this database, the United States has a significantly higher number of cheese types represented compared to other countries. The U.S. lists over 300 types, while the second-highest, France, has just over 150—meaning the U.S. has nearly twice as many. This discrepancy could be due to a few factors. The most likely explanations are: (1) the U.S. genuinely produces a wider variety of cheeses, or (2) the source of the data—a cheese e-commerce platform—may be based in the U.S. or have more partnerships with U.S.-based producers.
 
-## Exploration of Milk Types
+### Exploration of Milk Types
 
 ```{r}
 df_cheeses %>%
@@ -177,7 +181,7 @@ df_cheeses %>%
 
 -   The most common combination of milk types is cow and goat, which is not surprising given that these are the two most common types of milk used in cheese production. We also see that there are two cheeses that are made from four types of milk (cow, goat, sheep, water buffalo).
 
-## Cheese Types
+### Cheese Types
 
 ```{r}
 df_cheeses %>%
@@ -248,12 +252,15 @@ df_cheeses %>%
 
 ```
 
+**Observations:**
+
+-   Less popular/common milk types, such as donkey, moose, camel, and plant-based, have many fewer types of cheeses that they are made into. It is possible that certain types of milk only have properties conducive to certain types of cheese. Comparatively, milks that are more common, like cow, goat and sheep milk are able to be used in a lot more types of cheese.
+
 ## Analysis
 
-```{r}
-```
+This section includes analysis for the null hypothesis and its three sub-hypotheses.
 
-```{r}
+```{r-milk}
 # stacked bar chart of milk type in top 5 country
 
 df_cheeses %>%
@@ -346,8 +353,6 @@ milk_chi_tests %>%
 
 -   The second chi-squared test looks at each individual cheese's variation. All of them still have a p-value beneath 0.01 and have a very high X-squared value. The most prominent statistical difference is seen through the proportionate use of sheep milk. When referencing the *Top 5 Countries by Cheese Milk Type Composition* we see that this is echoed with the high level of variation seen between the size of blue bars across countries. Overarchingly, it is reasonable to say there is a statistical difference between the top five countries producing cheese and their milk proportion use.
 
-***cheese type vs. country***
-
 ```{r}
 # stacked bar chart of cheese type in top 5 country
 df_cheeses %>%
@@ -374,11 +379,73 @@ df_cheeses %>%
     x = "Country", y = "Percentage", fill = "Type"
   ) +
   theme_minimal()
+
+#Chi-Squared test overall
+# Build contingency table from raw counts
+type_country_table <- df_cheeses %>%
+  mutate(type_list = str_split(type, ", ")) %>%
+  unnest(type_list) %>%
+  filter(country %in% c("United States", "France", "Italy", "Canada", "Australia")) %>%
+  count(country, type_list) %>%
+  pivot_wider(names_from = type_list, values_from = n, values_fill = 0) %>%
+  column_to_rownames("country") %>%
+  as.matrix()
+
+# Perform Chi-squared test
+type_chisq_result <- chisq.test(type_country_table)
+
+# Output result
+type_chisq_result
+
+#Chi-Squared between each chees type across countries
+# Prepare the dataset with individual milk types
+df_type_split <- df_cheeses %>%
+  filter(country %in% top_countries) %>%
+  mutate(type_list = str_split(type, ", ")) %>%
+  unnest(type_list)
+
+# Get unique milk types
+type_types <- df_type_split %>%
+  distinct(type_list) %>%
+  pull()
+
+# Perform a chi-squared test for each milk type across countries
+type_chi_tests <- map_df(type_types, function(type_type) {
+  df_type_test <- df_type_split %>%
+    mutate(has_type = type_list == type_type) %>%
+    count(country, has_type) %>%
+    pivot_wider(names_from = has_type, values_from = n, values_fill = 0)
+
+  # Skip if not enough variation
+  if (ncol(df_type_test) < 3 || sum(df_type_test[[2]]) == 0 || sum(df_type_test[[3]]) == 0) {
+    return(NULL)
+  }
+
+  tbl <- as.matrix(df_type_test[,-1])
+  rownames(tbl) <- df_type_test$country
+
+  chisq_result <- chisq.test(tbl)
+  tidy(chisq_result) %>%
+    mutate(type_type = type_type)
+})
+
+# View results
+type_chi_tests %>%
+  select(type_type, statistic, p.value) %>%
+  arrange(p.value)
 ```
 
 **Observations:**
 
--   
+*Top 5 Countries by Cheese Type Composition*
+
+-   When looking at the visualization "Top 5 Countries by Cheese Type Composition," there is a very large span of cheese types and the presence of each of them.
+
+-   All countries have a wide distribution of cheese types, with very few cheese types not represented many times. One of the few cheeses that follow this exception is whey cheese which is only seen in France and Australia. Some countries have greater level of cheese type reportings than other countries. Australia, France and United States all have NA reportings that are roughly equal to one type of cheese. However, Italy and Canada both have little to no NA reportings. This lack of NAs allows there to be much greater quantities in different cheese types. For example, Italy has a much larger amount of soft-ripened cheese than other countries. However, as there are so many different cheese types and such a large quantity of cheeses reported in the dataset, this graph is very hard to determine. Thus, a chi-squared analysis was performed to try to better understand the variation between cheese types across the top five different countries.
+
+*Chi-Squared Table*
+
+-   The chi-squared table shows that there is a statistical difference between different countries and certain cheese types. The overall chi-squared test shows a high value in the X-squared value and a very low p-value, indicating high statistical difference. To break this analysis down further, we performed a chi-squared for each individual cheese type across the different countries. With a 0.05 threshold, every single cheese still had a high X-squared value and low p-value and was able to remain statistically different. Out of all of the cheese types, soft is by far the most statistically different and soft-ripened and fresh soft come soon after. This indicates that there is large variance in the soft cheese category between countries which makes sense as it is one of the most popular/produces types of cheese.
 
 ```{r}
 top_countries <- df_cheeses %>%
@@ -396,10 +463,25 @@ df_cheeses %>%
   labs(
     x = "Country",
     y = "Number of Cheeses",
-    title = "Top 5 Cheese-Producing Countries by Color",
+    title = "Top 5 Cheese-Producing Countries by Cheese Color",
     fill = "Cheese Color"
   ) +
   theme_minimal()
+
+#Chi-Squared test overall
+# Build contingency table from raw counts
+color_country_table <- df_cheeses %>%
+  mutate(color_list = str_split(color, ", ")) %>%
+  unnest(color_list) %>%
+  filter(country %in% c("United States", "France", "Italy", "Canada", "Australia")) %>%
+  count(country, color_list) %>%
+  pivot_wider(names_from = color_list, values_from = n, values_fill = 0) %>%
+  column_to_rownames("country") %>%
+  as.matrix()
+
+# Perform Chi-squared test and output result
+color_chisq_result <- chisq.test(color_country_table)
+color_chisq_result
 
 #Run a Chi Squared test for each color across the different top five countries
 # Top 5 countries with most cheeses
@@ -420,7 +502,7 @@ cheese_colors <- df_filtered %>%
 # Run chi-squared test per color, safely
 color_tests <- map_df(cheese_colors, function(clr) {
   df_color <- df_filtered %>%
-    filter(color == clr)
+  filter(color == clr)
 
   # Contingency table of country counts
   tbl <- table(df_color$country)
@@ -431,7 +513,7 @@ color_tests <- map_df(cheese_colors, function(clr) {
   # Run test and return tidy result
   chisq_result <- chisq.test(tbl)
   tidy(chisq_result) %>%
-    mutate(color = clr)
+  mutate(color = clr)
 })
 
 # View results
@@ -441,9 +523,9 @@ color_tests %>%
 
 **Observations:**
 
-*"Top 5 Cheese-Producing Countries by Color"*
+*"Top 5 Cheese-Producing Countries by Cheese Color"*
 
--   When looking at the visualization "Top 5 Cheese-Producing Countries by Color" there is a very large span of cheese colors and the presence of each of them.
+-   When looking at the visualization "Top 5 Cheese-Producing Countries by Cheese Color" there is a very large span of cheese colors and the presence of each of them.
 
 -   Three colors as well as NAs appear to be prominent across all of the top five countries: pale yellow, white, and ivory. While these three cheese are all mostly prominent (but to a lesser extent in Australia), there is still a large variation between all of the countries. This could be for a variety of different reasons. This could be influenced by the milk and type palette of the cheese as well as the overall production value. The latter is largely true as we see generally an overarching decreasing trend as we go from the U.S. to France to Italy to Canada to Australia with the cheese colors. However, there are several exceptions. One of these exceptions is the minimal/diminished presence of white cheese in Canada, where the coloring is more distributed, while Australia has mainly white cheeses. Another exception is pale yellow cheese and to an extent ivory cheese. This cheese is seen in abundance in the United States, but much less so in other countries.
 
@@ -451,7 +533,7 @@ color_tests %>%
 
 *Chi-Squared Table*
 
--   The Chi-Squared table shows that there is a statistical difference between different countries and certain cheese colors. The three cheese colors exhibiting the highest difference are ivory, white and pale yellow (as seen in the prior observations). These cheese colors have both a very low p-value and a very high Chi-Squared statistic value, indicating a large difference between countries. When setting a 0.05 significance value 6/13 cheeses fall above this list, indicating that due to their higher p-value and low statistic value, there is not a statistical difference between cheese color and country for them. This may be due to a smaller sample size/presence of these cheeses in general, however. Overall, it can be said that there is a statistical difference between certain cheese colors across the top five countries that produce cheese.
+-   The chi-squared table shows that there is a statistical difference between different countries and certain cheese colors. The three cheese colors exhibiting the highest difference are ivory, white and pale yellow (as seen in the prior observations). These cheese colors have both a very low p-value and a very high chi-squared statistic value, indicating a large difference between countries. When setting a 0.05 significance value 6/13 cheeses fall above this list, indicating that due to their higher p-value and low statistic value, there is not a statistical difference between cheese color and country for them. This may be due to a smaller sample size/presence of these cheeses in general, however. Overall, it can be said that there is a statistical difference between certain cheese colors across the top five countries that produce cheese.
 
 ## Conclusion and Remaining Questions
 
@@ -464,9 +546,21 @@ Our guiding question for this analysis was: "How are the top five cheese-produci
     -   There is no statistical difference between the top five cheese-producing countries based on the milk used in cheese.
     -   There is no statistical difference between the top five cheese-producing countries based on the color of cheese.
 
-From our key analyses about we reject the null hypothesis for \_\_\_\_\_\_.
+From our key analyses about we reject the null hypothesis "There is no statistical difference between the top five cheese-producing countries based on certain cheese qualities."
+
+Instead, as proven through three different chi-squared analyses and data visualization for each of our three more specific null hypotheses, there is statistical difference between the top five cheese-producing countries, the types of cheese they make, the color the cheeses and milk used in them.
+
+When looking at the graph *"Top 5 Countries by Cheese Milk Type Composition,"* and its consequent chi-squared analysis, we reject the null hypothesis "There is no statistical difference between the top five cheese-producing countries based on the milk used in cheese." The overall chi-squared analysis shows an X-squared value of 193.21 and a p-value of 2.2\*10\^-6. These values indicate statistical difference. While there are similar trends of what milk is deemed "most popular" or "most used," the actual proportion of its use between each country varies widely. Further, After the top 1-2 milk types, the countries vary widely on choice.
+
+When looking at the graph "*Top 5 Countries by Cheese Type Composition"* and its consequent chi-squared analysis, we reject the null hypothesis "There is no statistical difference between the top five cheese-producing countries based on type of cheese. Instead, its overall chi-squared analysis indicates an X-squared value of 313.94 and a p-value of 2.2\*10\^-6, indicating statistical variance. When further breaking the analysis down to look at each cheese type across each country, all p-values remained below 0.05. Most countries have a very wide variety of cheese types that they use. More importantly, the most statistically significant groups tend to have a common genre of type. That is, soft is by far the most statistically different and soft-ripened and fresh soft come soon after. All three cheeses belong to the "soft" grouping, and if these three were lumped together, or cheese were grouped otherwise (ex. hard, firm, ripened, etc) there could be differences in the results.
+
+Lastly, when looking at the graph *"Top 5 Cheese-Producing Countries by Cheese Color,"* and its consequent chi-squared analysis, we reject the null hypothesis "There is no statistical difference between the top five cheese-producing countries based on the color of cheese." Instead, when looking at its chi-squared analysis, we find that 7/13 cheese colors have statistical difference across the countries, as they have p-values below 0.05 and a high X-squared value. The overall chi-squared value has a p-value of 1.918\*10\^-14 and an X-squared value of 190.15. While color is statistically different amongst countries, the chi-squared analysis is likely highly influenced by the pale yellow, ivory, white and yellow p-values. There is large variation between main colors, but it diminishes as color popularity decreases.
+
+However, despite rejecting all three null hypotheses, the results may not be fully trusted. The source for which this data comes from calls into several questions and possible sources of error that could influence these findings. One such source of error/influence comes from the selection of cheese data seen on the cheese.com website. As cheese.com boasts a wide range of cheeses, it is plasusible that they may pull a wide variety of cheeses. In doing so, they could curate a cheese database with a wider variety of milk types, cheese types and colors than typical. This in turn would make data seem a lot more statistically different than it actually is. Additionally, as cheese.com includes no indication of popularity of production and only shows that it is produced in a certain country, this could influence the statistical difference as well. For example, the number of types of cheese with straw coloring is very low, but if it is a highly popular cheese, it could be the most produced cheese color in a country. Due to the lack of production quantification, there is no way to tell this. Other areas of error include the fact that each cheese is produced in only one country, leading to limitations in variance, as well as a lack of reporting and NA values. Some times, the NA values account for the same quantity as a factor in a variable does. If these NA values had reportings, it is plausible that differences could shift. Due to these reasons, while we still reject the null hypotheses, we recommend proceeding with caution before designing models or making estimates based on this non-random sample.
 
 ***Remaining Questions***
+
+After performing this analysis, several questions still remain.
 
 As this analysis only focused on the top five cheese-producing countries to make the analysis comprehensible, it would be interesting to *analyze other countries further*. This could lead to several questions:
 
