@@ -102,7 +102,7 @@ sapply(df_cheeses, function(x) sum(is.na(x)))  # Count missing values per column
 The important variables in this dataset are:
 
 | Variable | Class | Description |
-|------------------------|------------------------|------------------------|
+|----|----|----|
 | cheese | character | Name of the cheese. |
 | url | character | Location of the cheese's description at cheese.com |
 | milk | character | The type of milk used for the cheese, when known. |
