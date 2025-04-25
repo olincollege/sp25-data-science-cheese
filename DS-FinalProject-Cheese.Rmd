@@ -181,7 +181,7 @@ df_cheeses %>%
 
 -   The most common combination of milk types is cow and goat, which is not surprising given that these are the two most common types of milk used in cheese production. We also see that there are two cheeses that are made from four types of milk (cow, goat, sheep, water buffalo).
 
-### Cheese Types
+### Exploration of Cheese Types
 
 ```{r}
 df_cheeses %>%
